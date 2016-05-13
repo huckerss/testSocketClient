@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         try {
-            socket.close();
+            if(socket != null)
+                socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private Thread checkUpdate = new Thread() {
+
         public void run() {
             try {
                 String line;
@@ -116,12 +118,15 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private Runnable showUpdate = new Runnable() {
+
         public void run() {
             Toast.makeText(MainActivity.this, "Coming word: " + html, Toast.LENGTH_SHORT).show();
         }
+
     };
 
     public void setSocket(String ip, int port) throws IOException {
+
         try {
             socket = new Socket(ip, port);
             networkWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -130,5 +135,6 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e);
             e.printStackTrace();
         }
+
     }
 }
