@@ -1,5 +1,6 @@
 package com.example.myeonghun.testsocketclient;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -12,11 +13,14 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private BufferedReader networkReader;
     private BufferedWriter networkWriter;
 
-    private String ip = "192.168.0.27"; // IP
-    private int port = 5005; // PORT번호
+    private String ipAddress = "192.168.150.11"; // IP
+    private int portNum = 5005; // PORT번호
 
     private TextView txtResponse;
     private EditText edtTextAddress, edtTextPort, edtTextSendMsg;
@@ -81,19 +85,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // 클릭이벤트 리스너
     View.OnClickListener buttonConnectOnClickListener = new View.OnClickListener() {
 
         public void onClick(View arg0) {
 
-            ip = edtTextAddress.getText().toString();
-            port = Integer.parseInt(edtTextPort.getText().toString());
+            ipAddress = edtTextAddress.getText().toString();
+            portNum = Integer.parseInt(edtTextPort.getText().toString());
 
-            try {
-                setSocket(ip, port);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            MainThread thread = new MainThread();
+            thread.setDaemon(true);
+            thread.start();
 
             checkUpdate.start();
         }
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void run() {
             Toast.makeText(MainActivity.this, "Coming word: " + html, Toast.LENGTH_SHORT).show();
+            txtResponse.setText(html);
         }
 
     };
@@ -136,5 +138,15 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    class MainThread extends Thread {
+        public void run() {
+            try {
+                setSocket(ipAddress, portNum);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
